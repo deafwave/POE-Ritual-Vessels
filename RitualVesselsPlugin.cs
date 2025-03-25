@@ -32,6 +32,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
         if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel >= 83)
             return;
 
+        // TODO: Ignore gigantism splits
         if (entity.Type == EntityType.Monster && entity.Rarity == MonsterRarity.Unique && entity.RenderName != "Volatile")
         {
             if (!uniqueMonsterIdentifiers.Contains(entity.Id))
