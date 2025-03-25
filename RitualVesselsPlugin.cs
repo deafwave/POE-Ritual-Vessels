@@ -29,6 +29,9 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
 
     public override void EntityAdded(Entity entity)
     {
+        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel >= 83)
+            return;
+
         if (entity.Type == EntityType.Monster && entity.Rarity == MonsterRarity.Unique && entity.RenderName != "Volatile")
         {
             if (!uniqueMonsterIdentifiers.Contains(entity.Id))
@@ -60,6 +63,9 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
     private readonly Stopwatch _sinceLastReloadStopwatch = Stopwatch.StartNew();
     public override Job Tick()
     {
+        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel >= 83)
+            return null;
+
         if (GameController.Game.IngameState.InGame && _sinceLastReloadStopwatch.Elapsed > TimeSpan.FromSeconds(0.5))
         {
             CalculateRitualProximityScores();
@@ -69,7 +75,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
 
     public override void Render()
     {
-        if (!GameController.Game.IngameState.InGame)
+        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel >= 83)
             return;
 
         effectHelper.DrawRitualSize(ritualScores);
