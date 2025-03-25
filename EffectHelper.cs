@@ -41,7 +41,7 @@ public class EffectHelper(
 
             if (entity.Metadata.Contains("Metadata/Terrain/Leagues/Ritual/RitualRuneObject"))
             {
-                DrawHazard($"Ritual SCORE: {ritualScores[entity.Id]}", pos, entity.PosNum, 1000.0f, 30, SharpDX.Color.LightBlue);
+                DrawHazard($"Ritual SCORE: {ritualScores[entity.Id]}", pos, entity.PosNum, 1050.0f, 30, SharpDX.Color.LightBlue);
             }
         }
     }
