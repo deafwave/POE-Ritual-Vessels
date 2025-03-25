@@ -109,7 +109,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
         {
             foreach (var ritualId in ritualIdentifiers)
             {
-                if (Vector3.Distance(uniqueMonsterPositions[monsterId], ritualPositions[ritualId]) <= 1000)
+                if (Vector3.Distance(uniqueMonsterPositions[monsterId], ritualPositions[ritualId]) <= 1050)
                 {
                     ritualScores[ritualId] += uniqueMonsterScores[monsterId];
                 }
