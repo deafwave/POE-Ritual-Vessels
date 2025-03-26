@@ -55,6 +55,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
             {
                 ritualPositions[entity.Id] = entity.PosNum;
                 ritualIdentifiers.Add(entity.Id);
+                ritualScores[entity.Id] = 0;
             }
         }
 
@@ -64,11 +65,12 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
     private readonly Stopwatch _sinceLastReloadStopwatch = Stopwatch.StartNew();
     public override Job Tick()
     {
-        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel >= 83)
+        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel >= 83 || GameController.Area.CurrentArea.RealLevel <= 68)
             return null;
 
-        if (GameController.Game.IngameState.InGame && _sinceLastReloadStopwatch.Elapsed > TimeSpan.FromSeconds(0.5))
+        if (_sinceLastReloadStopwatch.Elapsed > TimeSpan.FromSeconds(0.5))
         {
+            _sinceLastReloadStopwatch.Restart();
             CalculateRitualProximityScores();
         }
         return null;
@@ -76,7 +78,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
 
     public override void Render()
     {
-        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel >= 83)
+        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel >= 83 || GameController.Area.CurrentArea.RealLevel <= 68)
             return;
 
         effectHelper.DrawRitualSize(ritualScores);
@@ -96,15 +98,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
 
     private void CalculateRitualProximityScores()
     {
-        ritualScores.Clear();
-
-        // Init
-        foreach (var ritualId in ritualIdentifiers)
-        {
-            ritualScores[ritualId] = 0;
-        }
-
-        // Calc Score
+        // Update Score
         foreach (var monsterId in uniqueMonsterIdentifiers)
         {
             foreach (var ritualId in ritualIdentifiers)
@@ -115,7 +109,5 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
                 }
             }
         }
-
-
     }
 }
