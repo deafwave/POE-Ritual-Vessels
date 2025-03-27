@@ -23,13 +23,13 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
     private readonly Dictionary<long, Vector3> uniqueMonsterPositions = [];
     private readonly HashSet<long> uniqueMonsterIdentifiers = []; // Track unique monster addresses
 
-    private readonly Dictionary<long, int> ritualScores = [];
+    private Dictionary<long, int> ritualScores = [];
     private readonly Dictionary<long, Vector3> ritualPositions = [];
     private readonly HashSet<long> ritualIdentifiers = []; // Track unique ritual addresses
 
     public override void EntityAdded(Entity entity)
     {
-        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel >= 83)
+         if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel > 83 || GameController.Area.CurrentArea.RealLevel <= 68)
             return;
 
         // TODO: Ignore gigantism splits (don't see anything in the code for this)
@@ -55,8 +55,8 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
             if (!ritualIdentifiers.Contains(entity.Id))
             {
                 ritualPositions[entity.Id] = entity.PosNum;
-                ritualIdentifiers.Add(entity.Id);
                 ritualScores[entity.Id] = 0;
+                ritualIdentifiers.Add(entity.Id);
             }
         }
 
@@ -66,7 +66,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
     private readonly Stopwatch _sinceLastReloadStopwatch = Stopwatch.StartNew();
     public override Job Tick()
     {
-        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel >= 83 || GameController.Area.CurrentArea.RealLevel <= 68)
+         if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel > 83 || GameController.Area.CurrentArea.RealLevel <= 68)
             return null;
 
         if (_sinceLastReloadStopwatch.Elapsed > TimeSpan.FromSeconds(0.5))
@@ -79,7 +79,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
 
     public override void Render()
     {
-        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel >= 83 || GameController.Area.CurrentArea.RealLevel <= 68)
+         if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel > 83 || GameController.Area.CurrentArea.RealLevel <= 68)
             return;
 
         effectHelper.DrawRitualSize(ritualScores);
@@ -99,16 +99,24 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
 
     private void CalculateRitualProximityScores()
     {
-        // Update Score
+        var temporaryRitualScores = new Dictionary<long, int>();
+        foreach (var ritualId in ritualIdentifiers)
+        {
+            temporaryRitualScores[ritualId] = 0;
+        }
+
+        // Calculate proximity scores
         foreach (var monsterId in uniqueMonsterIdentifiers)
         {
             foreach (var ritualId in ritualIdentifiers)
             {
                 if (Vector3.Distance(uniqueMonsterPositions[monsterId], ritualPositions[ritualId]) <= 1050)
                 {
-                    ritualScores[ritualId] += uniqueMonsterScores[monsterId];
+                    temporaryRitualScores[ritualId] += uniqueMonsterScores[monsterId];
                 }
             }
         }
+
+        ritualScores = temporaryRitualScores;
     }
 }
