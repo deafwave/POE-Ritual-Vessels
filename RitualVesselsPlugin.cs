@@ -41,7 +41,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
                 int value = 1;
                 if (entity.GetComponent<ObjectMagicProperties>().Mods.Contains("MonsterSupporterGigantism1")) // TODO: Validate there isn't other Gigantism
                 {
-                    value = 5;
+                    value = 100;
                 }
 
                 uniqueMonsterScores[entity.Id] = value;
