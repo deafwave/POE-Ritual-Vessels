@@ -13,23 +13,35 @@ public class EffectHelper(
     GameController gameController,
     Graphics graphics
 )
-{
-
-    private void DrawHazard(string text, Vector2 screenPos, Vector3 worldPos, float radius, int segments, SharpDX.Color color = default)
+{    private void DrawHazard(string text, Vector2 screenPos, Vector3 worldPos, float radius, int segments, SharpDX.Color color = default)
     {
         if (color == default)
         {
             color = SharpDX.Color.Red;
         }
 
+        // Make text much larger and more prominent
+        ImGui.PushFont(ImGui.GetIO().Fonts.Fonts[0]);
         var textSize = ImGui.CalcTextSize(text);
-        var textPosition = screenPos with { Y = screenPos.Y - textSize.Y / 2 };
+        ImGui.PopFont();
+        
+        // Position text higher above the circle
+        var textPosition = screenPos with { Y = screenPos.Y - textSize.Y - 20 };
 
-        graphics.DrawTextWithBackground(text, textPosition, color, FontAlign.Center, SharpDX.Color.Black with { A = 200 });
-        // graphics.DrawFilledCircleInWorld(worldPos, radius, color with { A = 150 }, segments);
-    }
-
-    public void DrawRitualSize(Dictionary<long, int> ritualScores)
+        // Draw multiple layers for glow effect
+        var glowColor = color with { A = 100 };
+        graphics.DrawTextWithBackground(text, textPosition with { X = textPosition.X + 2, Y = textPosition.Y + 2 }, glowColor, FontAlign.Center, SharpDX.Color.Transparent);
+        graphics.DrawTextWithBackground(text, textPosition with { X = textPosition.X - 2, Y = textPosition.Y - 2 }, glowColor, FontAlign.Center, SharpDX.Color.Transparent);
+        
+        // Main text with stronger background
+        graphics.DrawTextWithBackground(text, textPosition, color, FontAlign.Center, SharpDX.Color.Black with { A = 240 });
+        
+        // Draw multiple circle layers for enhanced visibility
+        graphics.DrawFilledCircleInWorld(worldPos, radius * 0.1f, color with { A = 80 }, segments);
+        
+        // Draw bright outline circle
+        graphics.DrawCircleInWorld(worldPos, radius * 0.4f, color with { A = 255 }, 5.0f, segments);
+    }    public void DrawRitualSize(Dictionary<long, int> ritualScores)
     {
         var terrainEntityList = gameController?.EntityListWrapper?.ValidEntitiesByType[EntityType.Terrain] ?? [];
 
@@ -41,7 +53,8 @@ public class EffectHelper(
 
             if (entity.Metadata.Contains("Metadata/Terrain/Leagues/Ritual/RitualRuneObject"))
             {
-                DrawHazard($"Ritual SCORE: {ritualScores[entity.Id]}", pos, entity.PosNum, 1050.0f, 30, SharpDX.Color.LightBlue);
+                // Much larger radius and more vibrant color
+                DrawHazard($"🔥 RITUAL SCORE: {ritualScores[entity.Id]} 🔥", pos, entity.PosNum, 2500.0f, 50, SharpDX.Color.Orange);
             }
         }
     }
