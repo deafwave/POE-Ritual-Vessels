@@ -14,7 +14,7 @@ public class EffectHelper(
 {    private void DrawHazard(string text, Vector2 screenPos, Vector3 worldPos, float radius, int segments, int score, SharpDX.Color color = default)
     {
         // Determine color based on score
-        if (score > 300)
+        if (score >= 300)
         {
             color = SharpDX.Color.Orange;
         }
