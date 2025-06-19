@@ -13,17 +13,6 @@ public class EffectHelper(
 )
 {    private void DrawHazard(string text, Vector2 screenPos, Vector3 worldPos, float radius, int segments, int score, SharpDX.Color color = default)
     {
-        // Determine color based on score
-        if (score >= 300)
-        {
-            color = SharpDX.Color.Orange;
-        }
-        else
-        {
-            // Faded out color for scores 300 and below
-            color = color == default ? SharpDX.Color.Gray with { A = 120 } : color with { A = 120 };
-        }
-
         ImGui.PushFont(ImGui.GetIO().Fonts.Fonts[0]);
         var textSize = ImGui.CalcTextSize(text);
         ImGui.PopFont();
@@ -54,8 +43,13 @@ public class EffectHelper(
 
             if (entity.Metadata.Contains("Metadata/Terrain/Leagues/Ritual/RitualRuneObject"))
             {
-                // Much larger radius and more vibrant color
-                DrawHazard($"🔥 RITUAL SCORE: {ritualScores[entity.Id]} 🔥", pos, entity.PosNum, 2500.0f, 50, ritualScores[entity.Id], SharpDX.Color.Orange);
+                var color = SharpDX.Color.Gray with { A = 120 };
+                if (ritualScores[entity.Id] >= 300)
+                {
+                    color = SharpDX.Color.Orange;
+                }
+
+                DrawHazard($" RITUAL SCORE: {ritualScores[entity.Id]}", pos, entity.PosNum, 2500.0f, 50, ritualScores[entity.Id], color);
             }
         }
     }
