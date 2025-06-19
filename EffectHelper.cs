@@ -11,7 +11,8 @@ public class EffectHelper(
     GameController gameController,
     Graphics graphics
 )
-{    private void DrawHazard(string text, Vector2 screenPos, Vector3 worldPos, float radius, int segments, int score, SharpDX.Color color = default)
+{
+    private void DrawHazard(string text, Vector2 screenPos, Vector3 worldPos, float radius, int segments, int score, SharpDX.Color color = default)
     {
         ImGui.PushFont(ImGui.GetIO().Fonts.Fonts[0]);
         var textSize = ImGui.CalcTextSize(text);
@@ -23,15 +24,18 @@ public class EffectHelper(
         graphics.DrawTextWithBackground(text, textPosition with { X = textPosition.X + 2, Y = textPosition.Y + 2 }, glowColor, FontAlign.Center, SharpDX.Color.Transparent);
         graphics.DrawTextWithBackground(text, textPosition with { X = textPosition.X - 2, Y = textPosition.Y - 2 }, glowColor, FontAlign.Center, SharpDX.Color.Transparent);
 
-        graphics.DrawTextWithBackground(text, textPosition, color, FontAlign.Center, SharpDX.Color.Black with { A = 240 });        if (score >= 300)
+        graphics.DrawTextWithBackground(text, textPosition, color, FontAlign.Center, SharpDX.Color.Black with { A = 240 });
+
+        var circleAlpha = (byte)60;
+        if (score >= 300)
         {
+            circleAlpha = (byte)255;
             graphics.DrawFilledCircleInWorld(worldPos, radius * 0.1f, color with { A = 80 }, segments);
         }
 
-        // Apply faded alpha for circles when score is 300 or below
-        var circleAlpha = (byte)(score > 300 ? 255 : 60);
         graphics.DrawCircleInWorld(worldPos, radius * 0.4f, color with { A = circleAlpha }, 5.0f, segments);
-    }public void DrawRitualSize(Dictionary<long, int> ritualScores)
+    }
+    public void DrawRitualSize(Dictionary<long, int> ritualScores)
     {
         var terrainEntityList = gameController?.EntityListWrapper?.ValidEntitiesByType[EntityType.Terrain] ?? [];
 
