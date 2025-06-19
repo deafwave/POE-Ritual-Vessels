@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Numerics;
+using System.Linq;
 using ExileCore;
 using ExileCore.PoEMemory;
+using ExileCore.PoEMemory.Components;
 using ExileCore.Shared.Enums;
 using ImGuiNET;
 
@@ -38,16 +40,23 @@ public class EffectHelper(
     public void DrawRitualSize(Dictionary<long, int> ritualScores)
     {
         var terrainEntityList = gameController?.EntityListWrapper?.ValidEntitiesByType[EntityType.Terrain] ?? [];
+        var ingameIconEntityList = gameController?.EntityListWrapper?.ValidEntitiesByType[EntityType.IngameIcon] ?? [];
+
+        var hasNamelessAo = ingameIconEntityList.Any(entity => 
+            entity.Metadata.Contains("Metadata/Terrain/Leagues/Ritual/RitualRuneInteractable") &&
+            entity.GetComponent<Animated>()?.BaseAnimatedObjectEntity?.Path?.Contains("Metadata/Effects/Spells/monsters_effects/League_Ritual/ritual_rune/runetypes/ritual_rune_nameless1.ao") == true);
+        
+        var color = hasNamelessAo ? SharpDX.Color.Green : SharpDX.Color.Gray with { A = 120 };
 
         foreach (var entity in terrainEntityList)
         {
-            if (entity.DistancePlayer >= 100)
+            if (entity.DistancePlayer >= 150)
                 continue;
+
             var pos = RemoteMemoryObject.pTheGame.IngameState.Camera.WorldToScreen(entity.PosNum);
 
             if (entity.Metadata.Contains("Metadata/Terrain/Leagues/Ritual/RitualRuneObject"))
             {
-                var color = SharpDX.Color.Gray with { A = 120 };
                 if (ritualScores[entity.Id] >= 300)
                 {
                     color = SharpDX.Color.Orange;
