@@ -46,7 +46,7 @@ public class EffectHelper(
             entity.Metadata.Contains("Metadata/Terrain/Leagues/Ritual/RitualRuneInteractable") &&
             entity.GetComponent<Animated>()?.BaseAnimatedObjectEntity?.Path?.Contains("Metadata/Effects/Spells/monsters_effects/League_Ritual/ritual_rune/runetypes/ritual_rune_nameless1.ao") == true);
         
-        var color = hasNamelessAo ? SharpDX.Color.Green : SharpDX.Color.Gray with { A = 120 };
+        var color = hasNamelessAo ? SharpDX.Color.LimeGreen with { A = 255 } : SharpDX.Color.Gray with { A = 120 };
 
         foreach (var entity in terrainEntityList)
         {
