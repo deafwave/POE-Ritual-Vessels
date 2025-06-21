@@ -107,7 +107,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
         // Check if player is within 750 range of any ritual and mark it as locked
         foreach (var ritualId in ritualIdentifiers)
         {
-            if (Vector3.Distance(playerPosition, ritualPositions[ritualId]) <= 750)
+            if (Vector3.Distance(playerPosition, ritualPositions[ritualId]) <= 1150)
             {
                 lockedRitualIdentifiers.Add(ritualId);
             }
