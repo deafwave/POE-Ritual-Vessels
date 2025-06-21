@@ -100,17 +100,35 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
     private void CalculateRitualProximityScores()
     {
         var temporaryRitualScores = new Dictionary<long, int>();
+        var playerPosition = GameController.Player.PosNum;
+        
         foreach (var ritualId in ritualIdentifiers)
         {
-            temporaryRitualScores[ritualId] = 0;
+            // Check if player is inside this ritual (lock the score if true)
+            bool playerInsideRitual = Vector3.Distance(playerPosition, ritualPositions[ritualId]) <= 500;
+            
+            if (playerInsideRitual)
+            {
+                // Keep the existing score for this ritual (locked)
+                temporaryRitualScores[ritualId] = ritualScores.ContainsKey(ritualId) ? ritualScores[ritualId] : 0;
+            }
+            else
+            {
+                // Calculate new score for this ritual
+                temporaryRitualScores[ritualId] = 0;
+            }
         }
 
-        // Calculate proximity scores
+        // Calculate proximity scores for rituals where player is not inside
         foreach (var monsterId in uniqueMonsterIdentifiers)
         {
             foreach (var ritualId in ritualIdentifiers)
             {
-                if (Vector3.Distance(uniqueMonsterPositions[monsterId], ritualPositions[ritualId]) <= 1050)
+                var playerPosition2 = GameController.Player.PosNum;
+                bool playerInsideRitual = Vector3.Distance(playerPosition2, ritualPositions[ritualId]) <= 500;
+                
+                // Only update score if player is not inside this ritual
+                if (!playerInsideRitual && Vector3.Distance(uniqueMonsterPositions[monsterId], ritualPositions[ritualId]) <= 1050)
                 {
                     temporaryRitualScores[ritualId] += uniqueMonsterScores[monsterId];
                 }
