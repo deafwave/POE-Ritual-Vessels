@@ -30,44 +30,58 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
 
     public override void EntityAdded(Entity entity)
     {
-         if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel > 83 || GameController.Area.CurrentArea.RealLevel <= 68)
+        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel > 83 || GameController.Area.CurrentArea.RealLevel <= 68)
             return;
 
-        // TODO: Ignore gigantism splits (don't see anything in the code for this)
-        // TODO: Ignore totems
-        if (entity.Type == EntityType.Monster && entity.Rarity == MonsterRarity.Unique && entity.RenderName != "Volatile")
+        if (entity.Type == EntityType.Monster)
         {
-            if (!uniqueMonsterIdentifiers.Contains(entity.Id))
-            {
-                int value = 1;
-                if (entity.GetComponent<ObjectMagicProperties>().Mods.Contains("MonsterSupporterGigantism1")) // TODO: Validate there isn't other Gigantism
-                {
-                    value = 100;
-                }
-
-                uniqueMonsterScores[entity.Id] = value;
-                uniqueMonsterPositions[entity.Id] = entity.PosNum;
-                uniqueMonsterIdentifiers.Add(entity.Id);
-            }
+            TrackMonster(entity);
         }
-
-        if (entity.Type == EntityType.Terrain && entity.Metadata.Contains("Metadata/Terrain/Leagues/Ritual/RitualRuneObject"))
+        else if (entity.Type == EntityType.Terrain && entity.Metadata.Contains("Metadata/Terrain/Leagues/Ritual/RitualRuneObject"))
         {
-            if (!ritualIdentifiers.Contains(entity.Id))
-            {
-                ritualPositions[entity.Id] = entity.PosNum;
-                ritualScores[entity.Id] = 0;
-                ritualIdentifiers.Add(entity.Id);
-            }
+            TrackRitual(entity);
         }
 
         base.EntityAdded(entity);
     }
 
+    private void TrackMonster(Entity entity)
+    {
+        string metadata = entity.Metadata;
+        int? value = null;
+
+        if (metadata.StartsWith("Metadata/Monsters/Exiles"))
+        {
+            var hasGigantism = entity.GetComponent<ObjectMagicProperties>().Mods.Contains("MonsterSupporterGigantism1");
+            value = hasGigantism ? 100 : 1;
+        }
+        // else if (metadata == "Metadata/Monsters/Spiders/MapSpiderBossSins")
+        // {
+        //     value = 0;
+        // }
+
+        if (value.HasValue && !uniqueMonsterIdentifiers.Contains(entity.Id))
+        {
+            uniqueMonsterScores[entity.Id] = value.Value;
+            uniqueMonsterPositions[entity.Id] = entity.PosNum;
+            uniqueMonsterIdentifiers.Add(entity.Id);
+        }
+    }
+
+    private void TrackRitual(Entity entity)
+    {
+        if (!ritualIdentifiers.Contains(entity.Id))
+        {
+            ritualPositions[entity.Id] = entity.PosNum;
+            ritualScores[entity.Id] = 0;
+            ritualIdentifiers.Add(entity.Id);
+        }
+    }
+
     private readonly Stopwatch _sinceLastReloadStopwatch = Stopwatch.StartNew();
     public override Job Tick()
     {
-         if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel > 83 || GameController.Area.CurrentArea.RealLevel <= 68)
+        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel > 83 || GameController.Area.CurrentArea.RealLevel <= 68)
             return null;
 
         if (_sinceLastReloadStopwatch.Elapsed > TimeSpan.FromSeconds(0.5))
@@ -80,7 +94,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
 
     public override void Render()
     {
-         if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel > 83 || GameController.Area.CurrentArea.RealLevel <= 68)
+        if (!GameController.Game.IngameState.InGame || GameController.Area.CurrentArea.IsPeaceful || GameController.Area.CurrentArea.RealLevel > 83 || GameController.Area.CurrentArea.RealLevel <= 68)
             return;
 
         effectHelper.DrawRitualSize(ritualScores);
@@ -103,7 +117,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
     {
         var temporaryRitualScores = new Dictionary<long, int>();
         var playerPosition = GameController.Player.PosNum;
-        
+
         // Check if player is within 750 range of any ritual and mark it as locked
         foreach (var ritualId in ritualIdentifiers)
         {
@@ -112,7 +126,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
                 lockedRitualIdentifiers.Add(ritualId);
             }
         }
-        
+
         foreach (var ritualId in ritualIdentifiers)
         {
             if (lockedRitualIdentifiers.Contains(ritualId))
