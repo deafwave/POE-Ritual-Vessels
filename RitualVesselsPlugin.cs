@@ -147,7 +147,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
             foreach (var ritualId in ritualIdentifiers)
             {
                 // Only update score if ritual is not locked
-                if (!lockedRitualIdentifiers.Contains(ritualId) && Vector3.Distance(uniqueMonsterPositions[monsterId], ritualPositions[ritualId]) <= 1025)
+                if (!lockedRitualIdentifiers.Contains(ritualId) && Vector3.Distance(uniqueMonsterPositions[monsterId], ritualPositions[ritualId]) <= 1045)
                 {
                     temporaryRitualScores[ritualId] += uniqueMonsterScores[monsterId];
                 }
