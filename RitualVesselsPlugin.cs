@@ -50,7 +50,7 @@ public class RitualVesselsPlugin : BaseSettingsPlugin<RitualVesselsSettings>
         string metadata = entity.Metadata;
         int? value = null;
 
-        if (metadata.StartsWith("Metadata/Monsters/Exiles"))
+        if (metadata.StartsWith("Metadata/Monsters/Exiles") && !metadata.Contains("Clone"))
         {
             var hasGigantism = entity.GetComponent<ObjectMagicProperties>().Mods.Contains("MonsterSupporterGigantism1");
             value = hasGigantism ? 100 : 1;
